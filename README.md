@@ -2,6 +2,9 @@
 
 A Deep Learning project for monocular depth estimation using the NYU Depth v2 dataset.
 
+![alt text](image.png)
+
+
 ## Features
 
 - Uses NYU Depth v2 dataset via Kaggle Hub (no local download required)
@@ -90,7 +93,7 @@ Where:
 $$\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}$$
 
 ### Delta Accuracy
-$$\delta_\tau = \frac{\#\text{ pixels where } \max(y_i/\hat{y}_i, \hat{y}_i/y_i) < \tau}{N} \times 100\%$$
+$$\delta_\tau = \frac{ \max(y_i/\hat{y}_i, \hat{y}_i/y_i) < \tau}{N} \times 100\%$$
 
 Typically computed for $\tau = 1.25, 1.25^2, 1.25^3$
 
@@ -108,4 +111,3 @@ These metrics measure:
 
 This project is for educational purposes.
 
-![alt text](image.png)
