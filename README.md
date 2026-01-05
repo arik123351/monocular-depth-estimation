@@ -45,14 +45,24 @@ The dataset is accessed through kagglehub without downloading locally.
 
 ## Usage
 
-### Training
+### Quick Training (Recommended for Testing)
+Fast training with 5 epochs on a small subset (5,000 samples):
+```bash
+python quick_train.py
+```
+Estimated runtime: **30-45 minutes on CPU**
+
+### Full Training
+Complete training with 20 epochs on all 50,688 samples:
 ```bash
 python src/train.py --config configs/config.yaml
 ```
+Estimated runtime: **4-6 hours on CPU**
 
 ### Evaluation
+Evaluate trained model and generate visualizations:
 ```bash
-python src/evaluate.py --model path/to/model.pth
+python src/evaluate.py --model outputs/best_model.pth --save-viz
 ```
 
 ### Exploration
@@ -63,6 +73,31 @@ Open and run `notebooks/exploration.ipynb` for data visualization.
 - Python 3.8+
 - PyTorch 2.1+
 - CUDA-enabled GPU (recommended)
+
+## Evaluation Metrics
+
+The model is evaluated using standard depth estimation metrics:
+
+### Mean Absolute Error (MAE)
+$$\text{MAE} = \frac{1}{N} \sum_{i=1}^{N} |y_i - \hat{y}_i|$$
+
+Where:
+- $N$ = number of pixels
+- $y_i$ = ground truth depth
+- $\hat{y}_i$ = predicted depth
+
+### Root Mean Square Error (RMSE)
+$$\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}$$
+
+### Delta Accuracy
+$$\delta_\tau = \frac{\#\text{ pixels where } \max(y_i/\hat{y}_i, \hat{y}_i/y_i) < \tau}{N} \times 100\%$$
+
+Typically computed for $\tau = 1.25, 1.25^2, 1.25^3$
+
+These metrics measure:
+- **MAE**: Average absolute difference in depth (in meters)
+- **RMSE**: Penalizes larger errors more heavily
+- **Delta**: Percentage of pixels within a threshold ratio
 
 ## Notes
 

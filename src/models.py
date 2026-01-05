@@ -264,8 +264,8 @@ def create_model(model_type='depth', backbone='resnet50', pretrained=True, devic
     Create and return a model.
     
     Args:
-        model_type (str): Type of model to create
-        backbone (str): Encoder backbone
+        model_type (str): Type of model to create ('depth', 'lightweight', 'mini')
+        backbone (str): Encoder backbone ('resnet18', 'resnet50')
         pretrained (bool): Use pretrained weights
         device (str): Device to move model to
         
@@ -274,11 +274,99 @@ def create_model(model_type='depth', backbone='resnet50', pretrained=True, devic
     """
     if model_type == 'depth':
         model = DepthEstimationNet(backbone=backbone, pretrained=pretrained)
+    elif model_type == 'lightweight':
+        model = LightweightDepthNet()
+    elif model_type == 'mini':
+        model = MiniDepthNet()
     else:
         raise ValueError(f"Model type {model_type} not supported")
     
     model = model.to(device)
     return model
+
+
+class LightweightDepthNet(nn.Module):
+    """Lightweight depth estimation network for faster training."""
+    
+    def __init__(self):
+        super().__init__()
+        
+        # Encoder: 3 convolutional blocks
+        self.encoder = nn.Sequential(
+            # Input: (B, 3, 256, 256)
+            nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1),      # (B, 16, 128, 128)
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            
+            nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1),     # (B, 32, 64, 64)
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),     # (B, 64, 32, 32)
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+        
+        # Decoder: 3 upsampling blocks
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),  # (B, 32, 64, 64)
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            
+            nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1),  # (B, 16, 128, 128)
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            
+            nn.ConvTranspose2d(16, 8, kernel_size=4, stride=2, padding=1),   # (B, 8, 256, 256)
+            nn.BatchNorm2d(8),
+            nn.ReLU(inplace=True),
+        )
+        
+        # Output layer
+        self.output = nn.Conv2d(8, 1, kernel_size=1)
+    
+    def forward(self, x):
+        """Forward pass."""
+        features = self.encoder(x)
+        decoded = self.decoder(features)
+        depth = self.output(decoded)
+        return depth
+
+
+class MiniDepthNet(nn.Module):
+    """Minimal depth estimation network for ultra-fast training (< 2 minutes)."""
+    
+    def __init__(self):
+        super().__init__()
+        
+        # Encoder: 2 convolutional blocks (minimal)
+        self.encoder = nn.Sequential(
+            # Input: (B, 3, 256, 256)
+            nn.Conv2d(3, 8, kernel_size=3, stride=2, padding=1),       # (B, 8, 128, 128)
+            nn.ReLU(inplace=True),
+            
+            nn.Conv2d(8, 16, kernel_size=3, stride=2, padding=1),      # (B, 16, 64, 64)
+            nn.ReLU(inplace=True),
+        )
+        
+        # Decoder: 2 upsampling blocks
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(16, 8, kernel_size=4, stride=2, padding=1),   # (B, 8, 128, 128)
+            nn.ReLU(inplace=True),
+            
+            nn.ConvTranspose2d(8, 4, kernel_size=4, stride=2, padding=1),    # (B, 4, 256, 256)
+            nn.ReLU(inplace=True),
+        )
+        
+        # Output layer
+        self.output = nn.Conv2d(4, 1, kernel_size=1)
+    
+    def forward(self, x):
+        """Forward pass."""
+        features = self.encoder(x)
+        decoded = self.decoder(features)
+        depth = self.output(decoded)
+        return depth
 
 
 if __name__ == "__main__":

@@ -253,7 +253,18 @@ def main(config_path):
     
     if writer is not None:
         writer.close()
-    print(f"\nTraining completed! Best model saved to {output_dir / 'best_model.pth'}")
+    
+    # Save final model
+    save_checkpoint(
+        model, optimizer, num_epochs - 1,
+        output_dir / 'final_model.pth',
+        metrics={'best_validation_loss': best_loss}
+    )
+    
+    print(f"\nTraining completed!")
+    print(f"  Best model: {output_dir / 'best_model.pth'}")
+    print(f"  Final model: {output_dir / 'final_model.pth'}")
+    print(f"  Best validation loss: {best_loss:.4f}")
 
 
 if __name__ == "__main__":

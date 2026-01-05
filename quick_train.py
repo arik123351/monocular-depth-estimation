@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Quick training script with reduced dataset for faster iteration.
-This uses only 5000 training and 200 validation samples for quick testing.
+Uses MiniDepthNet - a tiny model that trains in ~2 minutes!
 """
 
 import sys
@@ -21,20 +21,23 @@ if __name__ == '__main__':
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     
-    # Override for quick testing (use much smaller dataset)
-    config['training']['max_train_samples'] = 5000   # Use 5000 train samples instead of 50k
-    config['training']['max_val_samples'] = 200      # Use 200 val samples instead of 650
-    config['training']['epochs'] = 5                 # Train for just 5 epochs
+    # Override for quick testing with MINI model (trains in ~2 minutes!)
+    config['model']['type'] = 'mini'              # Use MiniDepthNet instead of ResNet
+    config['training']['max_train_samples'] = 5000   # Use 5000 train samples
+    config['training']['max_val_samples'] = 200      # Use 200 val samples
+    config['training']['epochs'] = 5                 # Train for 5 epochs
     
-    print("=" * 60)
-    print("QUICK TRAINING MODE")
-    print("=" * 60)
-    print(f"Model: {config['model']['backbone']}")
+    print("=" * 70)
+    print("ULTRA-QUICK TRAINING MODE (MiniDepthNet)")
+    print("=" * 70)
+    print(f"Model: MiniDepthNet (ultra-lightweight)")
     print(f"Epochs: {config['training']['epochs']}")
     print(f"Batch Size: {config['training']['batch_size']}")
     print(f"Train Samples: {config['training']['max_train_samples']}")
     print(f"Val Samples: {config['training']['max_val_samples']}")
-    print("=" * 60)
+    print("=" * 70)
+    print("⏱️  Estimated runtime: ~2-5 minutes on CPU")
+    print("=" * 70)
     print()
     
     # Save modified config
