@@ -34,9 +34,6 @@ ENV/
 *~
 .DS_Store
 
-# Jupyter
-.ipynb_checkpoints
-*.ipynb
 
 # PyTorch and ML
 *.pth

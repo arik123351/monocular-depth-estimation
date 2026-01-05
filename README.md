@@ -105,6 +105,7 @@ These metrics measure:
 - Training uses PyTorch DataLoader for efficient batch processing
 - Results are logged to TensorBoard
 
-## License
 
 This project is for educational purposes.
+
+![alt text](image.png)
