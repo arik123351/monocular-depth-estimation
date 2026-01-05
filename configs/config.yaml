@@ -1,0 +1,33 @@
+# Monocular Depth Estimation Configuration
+
+# Model Configuration
+model:
+  type: depth
+  backbone: resnet18          # resnet18 (faster), resnet50 (slower)
+  pretrained: true            # Use pretrained ImageNet weights
+
+# Training Configuration
+training:
+  batch_size: 8               # Increased for faster training
+  epochs: 20                  # Reduced from 100 for quick testing
+  lr: 0.0001                  # Learning rate
+  step_size: 5                # LR scheduler step size
+  gamma: 0.1                  # LR scheduler gamma
+  num_workers: 0              # DataLoader workers (set to 0 on Windows)
+  save_interval: 2            # Save checkpoint every N epochs
+
+# Dataset Configuration
+dataset_path: null            # Leave null to use kagglehub's default cache
+# Or specify a local path if you want to cache the dataset:
+# dataset_path: ./data/nyu_depth_v2
+
+# Output Configuration
+output_dir: ./outputs         # Directory to save models and logs
+use_tensorboard: false        # Disable TensorBoard for Windows compatibility
+
+# Optional: Limit dataset to N samples for faster prototyping
+# Set to null to use full dataset, or set to a number like 5000 for testing
+max_train_samples: null
+max_val_samples: null
+
+
